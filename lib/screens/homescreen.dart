@@ -40,25 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
           final plant = _plants[index];
           return Card(
             margin: const EdgeInsets.only(bottom: 16),
-            child: ListTile(
-              contentPadding: const EdgeInsets.all(16),
-              leading: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.asset(
-                  'assets/images/icons/${plant.plantImage}',
-                  width: 60,
-                  height: 60,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              title: Text(
-                plant.plantName,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              subtitle: Text(
-                plant.plantScientific,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
+            child: InkWell(
               onTap: () {
                 Navigator.push(
                   context,
@@ -67,6 +49,23 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 );
               },
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      plant.plantName,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      plant.plantScientific,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ],
+                ),
+              ),
             ),
           );
         },

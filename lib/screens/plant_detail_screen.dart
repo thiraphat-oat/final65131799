@@ -18,7 +18,7 @@ class PlantDetailScreen extends StatelessWidget {
             flexibleSpace: FlexibleSpaceBar(
               title: Text(plant.plantName),
               background: Image.asset(
-                'assets/images/plants/${plant.plantImage}',
+                plant.plantImage, // ตรวจสอบว่าใช้ชื่อแปรที่ถูกต้อง
                 fit: BoxFit.cover,
               ),
             ),
