@@ -34,6 +34,7 @@ class DatabaseHelper {
         plantImage TEXT NOT NULL
       )
     ''');
+
     await db.execute('''
       CREATE TABLE plantComponent (
         componentID INTEGER PRIMARY KEY,
@@ -41,6 +42,7 @@ class DatabaseHelper {
         componentIcon TEXT NOT NULL
       )
     ''');
+
     await db.execute('''
       CREATE TABLE LandUseType (
         landUseTypeID INTEGER PRIMARY KEY,
@@ -48,6 +50,7 @@ class DatabaseHelper {
         landUseTypeDescription TEXT NOT NULL
       )
     ''');
+
     await db.execute('''
       CREATE TABLE LandUse (
         landUseID INTEGER PRIMARY KEY,
@@ -66,8 +69,6 @@ class DatabaseHelper {
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
-      // Perform necessary migrations for version 2
-      // For example, you might add new columns or tables here
     }
   }
 
@@ -118,7 +119,52 @@ class DatabaseHelper {
       'landUseDescription': 'Ginger roots are used for digestive issues'
     });
   }
-/*เชื่อมโยงDart เข้ากับSQl */
+
+  Future<int> insertPlant(Plant plant) async {
+    final db = await database;
+    return await db.insert(
+      'plant',
+      plant.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<int> updatePlant(Plant plant) async {
+    final db = await database;
+    return await db.update(
+      'plant',
+      plant.toMap(),
+      where: 'plantID = ?',
+      whereArgs: [plant.plantID],
+    );
+  }
+
+  Future<void> updatePlantLandUses(int plantID, List<int> selectedLandUses) async {
+    final db = await database;
+
+    // ลบข้อมูล LandUse ที่ไม่ได้ถูกเลือก
+    await db.delete('LandUse', where: 'plantID = ?', whereArgs: [plantID]);
+
+    // เพิ่มข้อมูล LandUse ใหม่ที่ถูกเลือก
+    for (int landUseID in selectedLandUses) {
+      await db.insert('LandUse', {
+        'plantID': plantID,
+        'landUseTypeID': landUseID,
+        'componentID': 0, // ปรับเป็นค่าเริ่มต้น หรือเพิ่มข้อมูลที่เกี่ยวข้อง
+        'landUseDescription': 'Updated Land Use',
+      });
+    }
+  }
+
+  Future<int> deletePlant(int plantID) async {
+    final db = await database;
+    return await db.delete(
+      'plant',
+      where: 'plantID = ?',
+      whereArgs: [plantID],
+    );
+  }
+
   Future<List<Plant>> getPlants() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query('plant');
@@ -128,6 +174,19 @@ class DatabaseHelper {
         plantName: maps[i]['plantName'],
         plantScientific: maps[i]['plantScientific'],
         plantImage: maps[i]['plantImage'],
+      );
+    });
+  }
+
+  // เพิ่มเมธอดนี้เพื่อดึงข้อมูลจากตาราง plantComponent
+  Future<List<PlantComponent>> getPlantComponents() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query('plantComponent');
+    return List.generate(maps.length, (i) {
+      return PlantComponent(
+        componentID: maps[i]['componentID'],
+        componentName: maps[i]['componentName'],
+        componentIcon: maps[i]['componentIcon'],
       );
     });
   }
@@ -154,6 +213,19 @@ class DatabaseHelper {
         landUseDescription: maps[i]['landUseDescription'],
         landUseTypeName: maps[i]['landUseTypeName'],
         componentName: maps[i]['componentName'],
+      );
+    });
+  }
+
+  Future<List<LandUseType>> getLandUseTypes() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query('LandUseType');
+
+    return List.generate(maps.length, (i) {
+      return LandUseType(
+        landUseTypeID: maps[i]['landUseTypeID'],
+        landUseTypeName: maps[i]['landUseTypeName'],
+        landUseTypeDescription: maps[i]['landUseTypeDescription'],
       );
     });
   }

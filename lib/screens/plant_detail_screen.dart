@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:final65131799/database/model.dart';
 import 'package:final65131799/screens/land_use_screen.dart';
+import 'package:final65131799/screens/edit_plant_screen.dart'; // นำเข้าไฟล์แก้ไขพืช
 
 class PlantDetailScreen extends StatelessWidget {
   final Plant plant;
@@ -10,6 +11,22 @@ class PlantDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(plant.plantName),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditPlantScreen(plant: plant), // ไปยังหน้าจอแก้ไขพืช
+                ),
+              );
+            },
+          ),
+        ],
+      ),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
